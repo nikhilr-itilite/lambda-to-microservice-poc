@@ -7,7 +7,7 @@ from datetime import datetime
 import requests
 from helperlayer import get_cache_key_hotel, LegEvent
 
-from constants import mongo_obj
+from app.services.hotelrequesthub.constants import mongo_obj
 from opensearchlogger.logging import logger
 
 
