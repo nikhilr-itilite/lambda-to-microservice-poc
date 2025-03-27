@@ -28,8 +28,6 @@ GDS_VENDOR = "gds"
 
 @opensearch_logger("hotelrequesthub")
 def handler(event, context):
-    if not event:
-        return {"status": 400, "message": "Bad Request"}
     log_data = {}
     lambda_start = datetime.now()
     hotel_id = None
