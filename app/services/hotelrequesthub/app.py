@@ -16,7 +16,7 @@ from opensearchlogger.logging import logger, opensearch_logger
 from pydantic import ValidationError as PydanticValidationError
 
 from app.services.hotelrequesthub.constants import mongo_obj
-from hotel_request import HotelRequest
+from app.services.hotelrequesthub.hotel_request import HotelRequest
 
 newrelic.agent.initialize()
 
