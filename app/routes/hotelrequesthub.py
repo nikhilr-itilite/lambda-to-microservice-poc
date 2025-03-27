@@ -7,4 +7,12 @@ router = APIRouter()
 
 @router.get("/")
 async def initiate_hotelrequesthub():
-    return app.handler(None)
+    print("*********************HERE*****************************\n\n")
+    response = app.handler(None,None)
+    print(response)
+    if not response:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No data found",
+        )
+    return response

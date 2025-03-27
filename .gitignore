@@ -1,2 +1,18 @@
 venv/*
 **/.env
+**/__pycache__/*
+storage/*
+__pycache__
+*/__pycache__
+__pycache__/*
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+.aws-sam
+cdk.context.json
+.idea
+/.idea
+.anima/*
+htmlcov/*
+.coverage
+coverage.xml

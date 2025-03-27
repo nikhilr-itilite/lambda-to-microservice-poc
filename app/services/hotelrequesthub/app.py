@@ -26,7 +26,6 @@ GROUP_BOOKING_PAX_COUNT = int(os.environ["GROUP_BOOKING_PAX_COUNT"])
 GDS_VENDOR = "gds"
 
 
-@helpers.is_warmer
 @opensearch_logger("hotelrequesthub")
 def handler(event, context):
     if not event:
