@@ -1,0 +1,30 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body><OTA_HotelAvailRQ xmlns="http://www.opentravel.org/OTA/2003/05" RequestedCurrency="INR" SortOrder="TG_RANKING" Version="0.0" PrimaryLangID="en" SearchCacheLevel="VeryRecent">
+        <AvailRequestSegments>
+          <AvailRequestSegment>
+            <HotelSearchCriteria>
+              <Criterion>
+                <Address>
+                  <CityName>{}</CityName>
+                  <CountryName Code="{}"></CountryName>
+                </Address>
+                <HotelRef />
+                <StayDateRange Start="{}" End="{}" />
+                <RateRange MinRate="{}" />
+                <RoomStayCandidates>{}
+                </RoomStayCandidates>
+                {}
+                <TPA_Extensions>
+                  <Pagination enabled="false" hotelsFrom="1" hotelsTo="10" />
+                  <HotelBasicInformation>
+                    <Reviews />
+                  </HotelBasicInformation>
+                  <UserAuthentication password="{}" propertyId="{}" username="{}" />
+                </TPA_Extensions>
+              </Criterion>
+            </HotelSearchCriteria>
+          </AvailRequestSegment>
+        </AvailRequestSegments>
+      </OTA_HotelAvailRQ>
+    </soap:Body>
+</soap:Envelope>
