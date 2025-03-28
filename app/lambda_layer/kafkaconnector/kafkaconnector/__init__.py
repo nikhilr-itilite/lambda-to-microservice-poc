@@ -1,1 +1,0 @@
-from kafkaconnector.connector import *

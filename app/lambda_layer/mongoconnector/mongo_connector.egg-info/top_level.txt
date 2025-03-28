@@ -1,3 +1,0 @@
-mongoconnector
-read_me
-test

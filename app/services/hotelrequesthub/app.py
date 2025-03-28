@@ -39,8 +39,8 @@ def handler(event, context):
             "service": "hotelrequesthub",
         }
         os.environ["logging_unique_data"] = json.dumps(log_data)
-        logger.info("Hotel Request hub was started at {}".format(str(lambda_start)))
-        logger.info(f"Input request : {event}")
+        # logger.info("Hotel Request hub was started at {}".format(str(lambda_start)))
+        # logger.info(f"Input request : {event}")
         event = update_currency_value(event)
         start_event = time.time()
         travel_type = "domestic"
@@ -60,7 +60,7 @@ def handler(event, context):
         if location_details["country"].lower() != "india":
             travel_type = "international"
         start_mysql = time.time()
-        logger.info("[Benchmarking] event to mysql process time ----------- {}".format(start_mysql - start_event))
+        # logger.info("[Benchmarking] event to mysql process time ----------- {}".format(start_mysql - start_event))
 
         hotel_fre = mysql.get_hotel_fre(API_DB, client_id, travel_type, origin_country)
         if (
@@ -73,7 +73,7 @@ def handler(event, context):
         radius = float(radius[0]["geo_distance"]) if radius and len(radius) > 0 else None
         event["hotel_request"].update({"radius": radius})
         end_mysql = time.time()
-        logger.info("[Benchmarking] mysql fetch process time -----------{}".format(end_mysql - start_mysql))
+        # logger.info("[Benchmarking] mysql fetch process time -----------{}".format(end_mysql - start_mysql))
         cph_fre = add_cph_fre()
         hotel_fre["itilite_connector"].append(cph_fre)
         date_delta = (
@@ -94,7 +94,7 @@ def handler(event, context):
             f"Number of nights searched: {number_of_nights}, Number of rooms: {no_of_rooms_count}, "
             f"Number of pax: {total_pax_count}"
         )
-        logger.info(f"Hotel fre fetched {hotel_fre}")
+        # logger.info(f"Hotel fre fetched {hotel_fre}")
         for each_connector in hotel_fre:
             for each_vendor in hotel_fre[each_connector]:
                 if (
@@ -126,9 +126,9 @@ def handler(event, context):
         fre_data = hotel_fre["json_connector"] + hotel_fre["xml_connector"] + hotel_fre["itilite_connector"]
         t_update_trip_doc_schema = time.time()
         trip_doc = update_trip_doc_schema(hotel_fre, event)
-        logger.info(
-            "[Benchmarking] update_trip_doc_schema time : msg -----------{} {}".format(time.time() - t_update_trip_doc_schema, msg)
-        )
+        # logger.info(
+        #     "[Benchmarking] update_trip_doc_schema time : msg -----------{} {}".format(time.time() - t_update_trip_doc_schema, msg)
+        # )
         event["hotel_request"]["cwm_id"] = fre_data[0]["cwm_id"]
         print("cache triggger --------------", event["hotel_request"])
         print("trigger_consolidation_lambda_cache triggger --------------", event)
@@ -166,7 +166,7 @@ def handler(event, context):
     except Exception as ex:
         status_code = 500
         msg = f"Error formatting hotel FRE request data for trip_id : {str(ex)}, traceback - {traceback.format_exc()}"
-        logger.error(msg)
+        # logger.error(msg)
         push_error_message(msg)
         raise ex
     finally:
@@ -217,7 +217,7 @@ def update_trip_doc_schema(hotel_fre, req_data):
         vendor_req = []
         # vendor_status = []
         hotel_vendor_req_ids = []
-        logger.info("hotel fre bef ---------------------- {}".format(hotel_fre))
+        # logger.info("hotel fre bef ---------------------- {}".format(hotel_fre))
         t_db_insert = datetime.now()
         with trip_engine.transaction() as transaction:
             vendor_request_id = ObjectId()
@@ -241,7 +241,7 @@ def update_trip_doc_schema(hotel_fre, req_data):
             for hotel_fre_data in fre_configs:
                 try:
                     if hotel_fre_data.get("response_type", "") != "itilite" and not hotel_fre_data.get("end_point"):
-                        logger.info(f"None endpoint found in fre_config {hotel_fre_data}")
+                        # logger.info(f"None endpoint found in fre_config {hotel_fre_data}")
                         continue
                     currency_rate = {}
                     hotel_vendor_req_id = ObjectId()
@@ -253,7 +253,7 @@ def update_trip_doc_schema(hotel_fre, req_data):
                     hotel_fre_data["request_status"] = 1
                     vendor_currency = hotel_fre_data["derived_vendor_currency"]
                     vc = vendor_currency_rate_map[vendor_currency["type"]]
-                    logger.info("fre currency ip -----------{} {} {}".format(vc, cc, sc))
+                    # logger.info("fre currency ip -----------{} {} {}".format(vc, cc, sc))
                     currency_rate = helpers.get_currency_conv_rate(vc, cc, sc)
                     deal_codes = mysql.get_itilite_deal_codes_by_cvwdm_id(hotel_fre_data["cvwdm_id"], db_type=API_DB)
                     hotel_fre_data["deal_codes"] = deal_codes
@@ -273,13 +273,13 @@ def update_trip_doc_schema(hotel_fre, req_data):
                     transaction.save(hotel_vendor_req)
                     all_fre_conf.append(hotel_fre_data)
                 except PydanticValidationError as e:
-                    logger.error(f"Error FRE configs : {traceback.format_exc()} : {e}")
+                    # logger.error(f"Error FRE configs : {traceback.format_exc()} : {e}")
                     continue
             vendor_req = helpers.VendorRequest(**req_hotel)
             vendor_req.hotel_vendor_req = hotel_vendor_req_ids
             transaction.save(vendor_req)
-        logger.info("[Benchmarking] Transaction took {}".format(datetime.now() - t_db_insert))
-        logger.info("in fre conf doccccccc----------- {}".format(all_fre_conf))
+        # logger.info("[Benchmarking] Transaction took {}".format(datetime.now() - t_db_insert))
+        # logger.info("in fre conf doccccccc----------- {}".format(all_fre_conf))
         json_conn = list(filter(lambda d: d["response_type"] == "json" and d.get("threshold_surpassed", 0) == 0, all_fre_conf))
         xml_conn = list(filter(lambda d: d["response_type"] == "xml" and d.get("threshold_surpassed", 0) == 0, all_fre_conf))
         itilite_conn = list(
@@ -289,7 +289,8 @@ def update_trip_doc_schema(hotel_fre, req_data):
         result = {"xml": xml_conn, "json": json_conn, "itilite": itilite_conn}
         return result
     except Exception:
-        logger.error(f"Error while updating hotel vendor request document : {traceback.format_exc()}")
+        print("error")
+        # logger.error(f"Error while updating hotel vendor request document : {traceback.format_exc()}")
 
 
 # def trigger_consolidation_lambda_cache(leg_info,cache_leg_id, cache_type):
@@ -318,16 +319,16 @@ def trigger_consolidation_lambda_cache(leg_info):
         print("info request------", leg_info)
         t_start = datetime.now()
         response = trigger_consolidation_lambda(leg_info)
-        logger.info("[benchmarking] consolidation trigger took {}".format(str(datetime.now() - t_start)))
+        # logger.info("[benchmarking] consolidation trigger took {}".format(str(datetime.now() - t_start)))
         return response
     except Exception:
-        logger.error(f"Error triggereing consolidation: {traceback.format_exc()}")
+        # logger.error(f"Error triggereing consolidation: {traceback.format_exc()}")
         return {}
 
 
 def trigger_cold_cache_lambda(leg_info_data):
     try:
-        logger.info("trigger_cold_cache_lambda----------{}".format(leg_info_data))
+        # logger.info("trigger_cold_cache_lambda----------{}".format(leg_info_data))
         leg_info_data["hotel"]["hotel_request"]["vendor_request_id"] = str(
             leg_info_data["hotel"]["hotel_request"]["vendor_request_id"]
         )
@@ -335,18 +336,18 @@ def trigger_cold_cache_lambda(leg_info_data):
             lambda_name=os.environ["COLD_CACHE_LAMBDA"],
             payload=json.dumps(leg_info_data),
         )
-        logger.info("lambda resp----------{}".format(response))
+        # logger.info("lambda resp----------{}".format(response))
         return response
     except Exception:
-        logger.error(f"Error triggereing cold cache lambda: {traceback.format_exc()}")
+        # logger.error(f"Error triggereing cold cache lambda: {traceback.format_exc()}")
         return {}
 
 
 def trigger_consolidation_lambda(leg_info):
     try:
-        logger.info("trigger_consolidation_lambda----------{}".format(leg_info))
+        # logger.info("trigger_consolidation_lambda----------{}".format(leg_info))
         leg_info["body"]["hotel_request"]["vendor_request_id"] = str(leg_info["body"]["hotel_request"]["vendor_request_id"])
-        logger.info("trigger_consolidation_lambda----------{}".format(leg_info))
+        # logger.info("trigger_consolidation_lambda----------{}".format(leg_info))
         response = helpers.trigger_stepfunctions(
             state_machine_arn=os.environ["HOTEL_CONSOLIDATION_STATE_MACHINE_ARN"],
             state_machine_name=os.environ["HOTEL_CONSOLIDATION_STATE_MACHINE_NAME"],
@@ -354,7 +355,7 @@ def trigger_consolidation_lambda(leg_info):
         )
         return response
     except Exception:
-        logger.error(f"Error triggering hotel consolidation : {traceback.format_exc()}")
+        # logger.error(f"Error triggering hotel consolidation : {traceback.format_exc()}")
         return {}
 
 
@@ -426,16 +427,16 @@ def fetch_currency_rate_map(currencies):
                 for currency in currencies:
                     currency_rate_map[currency] = {"rate": currency_conv_resp[0].get("rates").get(currency), "type": currency}
         diff = datetime.now() - func_start_time
-        logger.info(f"time to finish the fetch_currency_rate_map is {diff.total_seconds()}")
+        # logger.info(f"time to finish the fetch_currency_rate_map is {diff.total_seconds()}")
         return currency_rate_map
     except Exception as e:
-        logger.error(f"Couldn't fetch vendor currency rate. error: {traceback.format_exc()}")
+        # logger.error(f"Couldn't fetch vendor currency rate. error: {traceback.format_exc()}")
         raise e
 
 
 def update_currency_value(event):
     try:
-        logger.info("----------update_currency_value--------%s", event)
+        # logger.info("----------update_currency_value--------%s", event)
         trip_info = event.get("trip_info")
         if trip_info:
             staff_currency = event["trip_info"]["staff_currency"]["type"]
@@ -446,9 +447,10 @@ def update_currency_value(event):
                 "".join(client_currency.split()) if (client_currency) else client_currency
             )
     except Exception as ex:
-        logger.error("------ERROR while update_currency_value %s,%s-----%s", trip_info, event, ex, exc_info=True)
+        print(ex)
+        # logger.error("------ERROR while update_currency_value %s,%s-----%s", trip_info, event, ex, exc_info=True)
     finally:
-        logger.info("----------update_currency_value result--------%s", event)
+        # logger.info("----------update_currency_value result--------%s", event)
         return event
 
 
@@ -468,7 +470,7 @@ def obj_to_str(data):
 #         result = {"xml": [], "json": [], "itilite": []}
 #         trip_info = json.loads(
 #             TRIP_ENGINE.find_one(helpers.Trip, helpers.Trip.trip_unique_id == ObjectId(trip_unique_id)).json())
-#         logger.info("trip_info {}".format(trip_info))
+#         # logger.info("trip_info {}".format(trip_info))
 #         hotels = {}
 #         vendor_req = []
 #         vendor_data = json.loads(
@@ -477,7 +479,7 @@ def obj_to_str(data):
 #                 helpers.VendorRequest.leg_request_id == ObjectId(leg_request_id),
 #             ).json()
 #         )
-#         logger.info("vendor_data -------- {}".format(vendor_data))
+#         # logger.info("vendor_data -------- {}".format(vendor_data))
 #
 #         for vendor_req_fre in vendor_data["hotel_vendor_req"]:
 #             vendor_req_data = TRIP_ENGINE.find_one(
@@ -485,7 +487,7 @@ def obj_to_str(data):
 #                 helpers.HotelVendorRequest.vendor_request_id == ObjectId(vendor_req_fre),
 #             )
 #             vendor_req.append(json.loads(vendor_req_data.json()))
-#         logger.info("vendors------- {}".format(vendor_req))
+#         # logger.info("vendors------- {}".format(vendor_req))
 #
 #         json_conn = list(filter(lambda d: d["response_type"] == "json", vendor_req))
 #         xml_conn = list(filter(lambda d: d["response_type"] == "xml", vendor_req))
@@ -493,8 +495,8 @@ def obj_to_str(data):
 #
 #         result = {"xml": xml_conn, "json": json_conn, "itilite": itilite_conn}
 #
-#         logger.info("final result vendors ------------- {}".format(result))
+#         # logger.info("final result vendors ------------- {}".format(result))
 #         return result
 #     except Exception as ex:
-#         logger.error(f"Error while creating request: {traceback.format_exc()}")
+#         # logger.error(f"Error while creating request: {traceback.format_exc()}")
 #         raise ex

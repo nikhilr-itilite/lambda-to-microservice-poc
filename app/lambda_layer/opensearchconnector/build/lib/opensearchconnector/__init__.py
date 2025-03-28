@@ -1,1 +1,0 @@
-from opensearchconnector.connector import *
