@@ -20,12 +20,12 @@ from helperlayer import (
 from opensearchlogger.logging import logger, opensearch_logger
 from s3connector import save_to_s3
 
-from hotel_vendor_request import helper, lat_long_grid_derivation
-from hotel_vendor_request.connector import HotelVendorRequestHandler
-from hotel_vendor_request.helper import ConnectorStatus
-from hotel_vendor_request.hotel import HotelVendorRequestPayload
-from mongo_util import mongo_obj
-import constants
+from app.services.hotelxmlconnector.hotel_vendor_request import helper, lat_long_grid_derivation
+from app.services.hotelxmlconnector.hotel_vendor_request.connector import HotelVendorRequestHandler
+from app.services.hotelxmlconnector.hotel_vendor_request.helper import ConnectorStatus
+from app.services.hotelxmlconnector.hotel_vendor_request.hotel import HotelVendorRequestPayload
+from app.services.hotelxmlconnector.mongo_util import mongo_obj
+from app.services.hotelxmlconnector import constants
 
 HOTEL_REQUEST_DATE_FORMAT = os.environ["HOTEL_REQUEST_DATE_FORMAT"]
 HOTEL_ERROR_S3_BUCKET = os.environ["HOTEL_ERROR_S3_BUCKET"]

@@ -9,7 +9,7 @@ from helperlayer import push_newrelic_custom_event
 from requests import Session
 from zeep import Client, Transport
 
-import constants
+from app.services.hotelxmlconnector import constants
 
 _hotel_vendor_reqs_soap_manager_instances = {}
 POOL_SIZE = 40  # Maximum SOAPManager instances

@@ -5,17 +5,20 @@ from datetime import datetime
 from typing import Optional
 
 from helperlayer import HotelFREConfig, AES_decryption_data
-from hotel_vendor_request.hotel import HotelVendorRequestPayload
-from hotel_vendor_request.SOAP import SOAPManager
+from app.services.hotelxmlconnector.hotel_vendor_request.hotel import HotelVendorRequestPayload
+from app.services.hotelxmlconnector.hotel_vendor_request.SOAP import SOAPManager
 from pydantic import BaseModel, Field
 from zeep import Settings
 from opensearchlogger.logging import logger
 from helperlayer import push_newrelic_custom_event, NR_API_EXECUTION_EVENT, HotelAPITypes
 import newrelic.agent
+from dotenv import load_dotenv
 
 newrelic_agent = newrelic.agent.register_application()
 
 from ..helper import construct_permitted_chains
+
+load_dotenv()
 
 TP_UAPI_VERSION = os.environ["TP_UAPI_VERSION"]
 TP_UAPI_WSDL_VERSION = os.environ["TP_UAPI_WSDL_VERSION"]
@@ -67,7 +70,7 @@ class GDSHotels:
         self.fre_config = fre_config
         wsdl = os.path.join(
             os.getcwd(),
-            "hotel_vendor_request/lib/gds/" + TP_UAPI_VERSION + "/hotel_" + TP_UAPI_WSDL_VERSION + "_0",
+            "app/services/hotelxmlconnector/hotel_vendor_request/lib/gds/" + TP_UAPI_VERSION + "/hotel_" + TP_UAPI_WSDL_VERSION + "_0",
             "Hotel.wsdl",
         )
         uname = AES_decryption_data(fre_config.uname)

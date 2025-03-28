@@ -12,13 +12,13 @@ import math
 
 from aws_lambda_powertools import Tracer
 from helperlayer import HotelFREConfig, ItiliteBaseException, datetime_format_converter, application_constants
-from hotel_vendor_request.hotel import HotelVendorRequestPayload
-from hotel_vendor_request.vendor.desiya import DesiyaHotels
-from hotel_vendor_request.vendor.gds import GDSHotels
+from app.services.hotelxmlconnector.hotel_vendor_request.hotel import HotelVendorRequestPayload
+from app.services.hotelxmlconnector.hotel_vendor_request.vendor.desiya import DesiyaHotels
+from app.services.hotelxmlconnector.hotel_vendor_request.vendor.gds import GDSHotels
 from kafkaconnector import KafkaConnector
-from logger import OpensearchLogger
+from app.services.hotelxmlconnector.logger import OpensearchLogger
 from lxml import etree
-from mongo_util import mongo_obj
+from app.services.hotelxmlconnector.mongo_util import mongo_obj
 from opensearchlogger.logging import logger
 from s3connector import S3Threading
 from .helper import batch_list
